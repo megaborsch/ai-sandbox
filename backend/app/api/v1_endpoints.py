@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
@@ -20,11 +20,11 @@ class SunsetResponse(BaseModel):
 
 
 class SunsetQuery(BaseModel):
-    query: str | None = Field(None, description="City name to search")
-    latitude: float | None = Field(
+    query: Optional[str] = Field(None, description="City name to search")
+    latitude: Optional[float] = Field(
         None, description="Latitude from browser geolocation", ge=-90, le=90
     )
-    longitude: float | None = Field(
+    longitude: Optional[float] = Field(
         None, description="Longitude from browser geolocation", ge=-180, le=180
     )
 
@@ -40,9 +40,18 @@ async def get_sunset(
     payload: SunsetQuery,
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> SunsetResponse:
-    if payload.query:
-        geocode: GeocodingResult | None = await geocode_city(
-            payload.query, request.app.state.http_client
+    query = payload.query.strip() if payload.query and payload.query.strip() else None
+
+    if payload.latitude is not None and payload.longitude is not None:
+        latitude, longitude, location_label, timezone_name = (
+            payload.latitude,
+            payload.longitude,
+            "Your location",
+            None,
+        )
+    elif query:
+        geocode: Optional[GeocodingResult] = await geocode_city(
+            query, request.app.state.http_client
         )
         if geocode is None:
             raise HTTPException(status_code=404, detail="City not found")
@@ -51,13 +60,6 @@ async def get_sunset(
             geocode.longitude,
             geocode.label,
             geocode.timezone,
-        )
-    elif payload.latitude is not None and payload.longitude is not None:
-        latitude, longitude, location_label, timezone_name = (
-            payload.latitude,
-            payload.longitude,
-            "Your location",
-            None,
         )
     else:
         raise HTTPException(

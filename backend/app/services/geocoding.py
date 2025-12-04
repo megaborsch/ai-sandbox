@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
 
 import httpx
 
@@ -14,7 +14,7 @@ class GeocodingResult:
     timezone: str
 
 
-async def geocode_city(city: str, client: httpx.AsyncClient) -> GeocodingResult | None:
+async def geocode_city(city: str, client: httpx.AsyncClient) -> Optional[GeocodingResult]:
     response = await client.get(
         GEOCODING_ENDPOINT,
         params={"name": city, "count": 1, "language": "en", "format": "json"},

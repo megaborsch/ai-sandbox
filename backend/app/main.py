@@ -1,6 +1,6 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import Annotated
+from typing import Annotated, Optional
 
 import httpx
 from fastapi import Depends, FastAPI
@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         yield
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(settings: Optional[Settings] = None) -> FastAPI:
     app_settings = settings or get_settings()
     app = FastAPI(title="Sunset Explorer", version="0.1.0", lifespan=lifespan)
 

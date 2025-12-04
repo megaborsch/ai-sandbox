@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from typing import Optional
 from zoneinfo import ZoneInfo
 
 import httpx
@@ -26,7 +27,7 @@ async def fetch_sunset(
     latitude: float,
     longitude: float,
     client: httpx.AsyncClient,
-    timezone_override: str | None = None,
+    timezone_override: Optional[str] = None,
 ) -> SunsetResult:
     response = await client.get(
         SUNSET_ENDPOINT,

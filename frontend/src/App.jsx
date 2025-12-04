@@ -18,20 +18,10 @@ export default function App() {
 
   useEffect(() => {
     if (!locationSupported) {
-      setStatus('Geolocation unavailable in this browser. Try searching for a city.');
+      setStatus('Geolocation unavailable in this browser. Search for a city.');
       return;
     }
-    setStatus('Requesting your location…');
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setStatus('Fetching sunset for your location…');
-        querySunset({ latitude: position.coords.latitude, longitude: position.coords.longitude });
-      },
-      () => {
-        setStatus('Location permission declined. Search for a city instead.');
-      },
-      { enableHighAccuracy: false, timeout: 5000, maximumAge: 600000 },
-    );
+    setStatus('Ready for sunset lookup. Search for a city or click "Get location".');
   }, [locationSupported]);
 
   const querySunset = async ({ latitude, longitude, query }) => {
@@ -65,6 +55,25 @@ export default function App() {
     querySunset({ query: city.trim() });
   };
 
+  const handleGetLocation = () => {
+    if (!locationSupported) {
+      setError('Geolocation not supported.');
+      return;
+    }
+    setStatus('Requesting your location…');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setStatus('Fetching sunset for your location…');
+        querySunset({ latitude: position.coords.latitude, longitude: position.coords.longitude });
+      },
+      () => {
+        setError('Location permission denied or unavailable.');
+        setStatus('');
+      },
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 600000 },
+    );
+  };
+
   return (
     <div className="app-shell">
       <ParticleField />
@@ -85,6 +94,11 @@ export default function App() {
           <button className="button" type="submit">
             Search
           </button>
+          {locationSupported && (
+            <button className="button" type="button" onClick={handleGetLocation} style={{ marginLeft: '0.5rem' }}>
+              Use Location
+            </button>
+          )}
         </form>
 
         {status && <div className="status">{status}</div>}

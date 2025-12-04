@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 import httpx
@@ -39,7 +39,7 @@ async def fetch_sunset(
     if results is None or "sunset" not in results:
         raise httpx.HTTPStatusError("Malformed response", request=response.request, response=response)
 
-    sunset_utc = datetime.fromisoformat(results["sunset"]).astimezone(UTC)
+    sunset_utc = datetime.fromisoformat(results["sunset"]).astimezone(timezone.utc)
     timezone_name = timezone_override or _resolve_timezone(latitude, longitude)
     sunset_local = sunset_utc.astimezone(ZoneInfo(timezone_name))
     return SunsetResult(

@@ -11,7 +11,7 @@ from .core.config import Settings, get_settings
 
 
 @asynccontextmanager
-def lifespan(app: FastAPI) -> AsyncIterator[None]:
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     async with httpx.AsyncClient(timeout=20.0) as client:
         app.state.http_client = client
         yield

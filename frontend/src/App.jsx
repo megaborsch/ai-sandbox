@@ -3,7 +3,13 @@ import ParticleField from './components/ParticleField';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
 
-const formatTime = (value) => new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const formatTime = (value, timezone = undefined) => {
+  const options = { hour: '2-digit', minute: '2-digit' };
+  if (timezone) {
+    options.timeZone = timezone;
+  }
+  return new Date(value).toLocaleTimeString([], options);
+};
 
 export default function App() {
   const [city, setCity] = useState('');
@@ -107,11 +113,14 @@ export default function App() {
         {sunset && (
           <div className="result">
             <h3>Sunset in {sunset.location}</h3>
-            <div className="timestamp">Local: {formatTime(sunset.sunset_local)}</div>
-            <div className="timestamp">UTC: {formatTime(sunset.sunset_utc)}</div>
+            <div className="timestamp">Local: {formatTime(sunset.sunset_local, sunset.timezone)}</div>
+            <div className="timestamp">UTC: {formatTime(sunset.sunset_utc, 'UTC')}</div>
             <div style={{ marginTop: '0.35rem', color: '#cdd5f1' }}>
               Timezone: {sunset.timezone} · Coordinates: {sunset.coordinates[0].toFixed(4)},
               {sunset.coordinates[1].toFixed(4)}
+            </div>
+            <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#9ca3af', fontStyle: 'italic' }}>
+              ※ Calculated by solar geometry model (±2–3 minutes accuracy)
             </div>
           </div>
         )}

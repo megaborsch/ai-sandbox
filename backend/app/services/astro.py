@@ -42,7 +42,11 @@ async def fetch_sunset(
 
     sunset_utc = datetime.fromisoformat(results["sunset"]).astimezone(timezone.utc)
     timezone_name = timezone_override or _resolve_timezone(latitude, longitude)
-    sunset_local = sunset_utc.astimezone(ZoneInfo(timezone_name))
+    try:
+        sunset_local = sunset_utc.astimezone(ZoneInfo(timezone_name))
+    except (KeyError, ValueError):
+        timezone_name = "UTC"
+        sunset_local = sunset_utc
     return SunsetResult(
         sunset_local=sunset_local,
         sunset_utc=sunset_utc,

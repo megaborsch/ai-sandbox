@@ -1,12 +1,16 @@
+import logging
 from datetime import datetime
 from typing import Annotated, Optional
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from ..core.config import Settings, get_settings
 from ..services.astro import SunsetResult, fetch_sunset
 from ..services.geocoding import GeocodingResult, geocode_city
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -50,9 +54,15 @@ async def get_sunset(
             None,
         )
     elif query:
-        geocode: Optional[GeocodingResult] = await geocode_city(
-            query, request.app.state.http_client
-        )
+        try:
+            geocode: Optional[GeocodingResult] = await geocode_city(
+                query, request.app.state.http_client
+            )
+        except (httpx.HTTPError, httpx.TimeoutException) as exc:
+            logger.warning("Geocoding API error for %r: %s", query, exc)
+            raise HTTPException(
+                status_code=502, detail="Geocoding service is temporarily unavailable."
+            )
         if geocode is None:
             raise HTTPException(status_code=404, detail="City not found")
         latitude, longitude, location_label, timezone_name = (
@@ -67,12 +77,18 @@ async def get_sunset(
             detail="Provide either a city query or both latitude and longitude.",
         )
 
-    sunset: SunsetResult = await fetch_sunset(
-        latitude=latitude,
-        longitude=longitude,
-        client=request.app.state.http_client,
-        timezone_override=timezone_name,
-    )
+    try:
+        sunset: SunsetResult = await fetch_sunset(
+            latitude=latitude,
+            longitude=longitude,
+            client=request.app.state.http_client,
+            timezone_override=timezone_name,
+        )
+    except (httpx.HTTPError, httpx.TimeoutException) as exc:
+        logger.warning("Sunset API error for (%s, %s): %s", latitude, longitude, exc)
+        raise HTTPException(
+            status_code=502, detail="Sunset calculation service is temporarily unavailable."
+        )
 
     return SunsetResponse(
         location=location_label,

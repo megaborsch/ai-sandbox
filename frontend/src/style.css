@@ -12,7 +12,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 a {
@@ -54,34 +54,57 @@ a {
 
 .controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
 .input {
-  flex: 1;
+  flex: 1 1 200px;
   padding: 0.75rem 0.9rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
   color: #e9edf5;
+  font-size: 1rem;
   outline: none;
+  min-height: 44px;
+  -webkit-appearance: none;
+}
+
+.input:focus {
+  border-color: rgba(90, 200, 250, 0.5);
+  box-shadow: 0 0 0 2px rgba(90, 200, 250, 0.15);
 }
 
 .button {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.2rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: linear-gradient(135deg, #5ac8fa, #7c4dff);
   color: #0c1024;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
+  min-height: 44px;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+}
+
+.button:active {
+  opacity: 0.8;
 }
 
 .status {
   margin-top: 0.25rem;
   color: #f6c177;
   font-size: 0.9rem;
+}
+
+.error-text {
+  color: #ff9fa3;
 }
 
 .result {
@@ -99,6 +122,18 @@ a {
 .result .timestamp {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   color: #9ad5ff;
+}
+
+.result-meta {
+  margin-top: 0.35rem;
+  color: #cdd5f1;
+}
+
+.result-note {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+  font-style: italic;
 }
 
 .background-canvas {
@@ -120,4 +155,59 @@ a {
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+/* Mobile: phones */
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 1rem;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
+  .panel {
+    padding: 1.25rem;
+    border-radius: 14px;
+  }
+
+  .subtitle {
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .input {
+    width: 100%;
+    flex: none;
+  }
+
+  .button {
+    width: 100%;
+    text-align: center;
+    padding: 0.85rem 1rem;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: center;
+  }
+}
+
+/* Tablets */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .app-shell {
+    padding: 1.5rem;
+  }
+}
+
+/* Prevent zoom on input focus on iOS */
+@supports (-webkit-touch-callout: none) {
+  .input {
+    font-size: 16px;
+  }
 }

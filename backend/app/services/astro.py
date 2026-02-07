@@ -4,10 +4,9 @@ from typing import Optional
 from zoneinfo import ZoneInfo
 
 import httpx
-from timezonefinder import TimezoneFinder
 
 SUNSET_ENDPOINT = "https://api.sunrise-sunset.org/json"
-_timezone_finder = TimezoneFinder()
+TIMEZONE_ENDPOINT = "https://api.open-meteo.com/v1/forecast"
 
 
 @dataclass
@@ -17,9 +16,26 @@ class SunsetResult:
     timezone: str
 
 
-def _resolve_timezone(latitude: float, longitude: float) -> str:
-    timezone = _timezone_finder.timezone_at(lng=longitude, lat=latitude)
-    return timezone or "UTC"
+async def _resolve_timezone(latitude: float, longitude: float, client: httpx.AsyncClient) -> str:
+    """Resolve timezone from coordinates using Open-Meteo API (no native deps)."""
+    try:
+        response = await client.get(
+            TIMEZONE_ENDPOINT,
+            params={
+                "latitude": latitude,
+                "longitude": longitude,
+                "forecast_days": 1,
+                "timezone": "auto",
+            },
+            timeout=10.0,
+        )
+        response.raise_for_status()
+        tz = response.json().get("timezone")
+        if tz:
+            return tz
+    except (httpx.HTTPError, KeyError):
+        pass
+    return "UTC"
 
 
 async def fetch_sunset(
@@ -41,7 +57,7 @@ async def fetch_sunset(
         raise httpx.HTTPStatusError("Malformed response", request=response.request, response=response)
 
     sunset_utc = datetime.fromisoformat(results["sunset"]).astimezone(timezone.utc)
-    timezone_name = timezone_override or _resolve_timezone(latitude, longitude)
+    timezone_name = timezone_override or await _resolve_timezone(latitude, longitude, client)
     try:
         sunset_local = sunset_utc.astimezone(ZoneInfo(timezone_name))
     except (KeyError, ValueError):

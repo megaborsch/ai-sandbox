@@ -8,8 +8,12 @@ when it detects a FastAPI app exported as `app`.
 import sys
 from pathlib import Path
 
-# Add backend directory to the Python path so imports resolve correctly
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
+# Ensure the backend package is importable whether Vercel keeps the api/ folder
+# or flattens the function root.
+api_dir = Path(__file__).resolve().parent
+project_root = api_dir.parent if api_dir.name == "api" else api_dir
+backend_path = project_root / "backend"
+sys.path.insert(0, str(backend_path))
 
 from app.main import create_app  # noqa: E402
 

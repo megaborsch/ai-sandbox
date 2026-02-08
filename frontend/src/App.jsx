@@ -1,6 +1,4 @@
 import { Component, useEffect, useMemo, useState } from 'react';
-import ParticleField from './components/ParticleField';
-
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const formatTime = (value, timezone = undefined) => {
@@ -141,7 +139,6 @@ function SunsetApp() {
 
   return (
     <div className="app-shell">
-      <ParticleField />
       <section className="panel" aria-live="polite">
         <h1 className="heading">Sunset Explorer</h1>
         <p className="subtitle">

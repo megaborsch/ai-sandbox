@@ -26,6 +26,10 @@ a {
   justify-content: center;
   min-height: 100vh;
   padding: 2rem;
+  background: radial-gradient(circle at 15% 20%, rgba(74, 68, 255, 0.2), transparent 40%),
+    radial-gradient(circle at 85% 25%, rgba(255, 141, 90, 0.22), transparent 45%),
+    radial-gradient(circle at 45% 85%, rgba(96, 231, 255, 0.22), transparent 45%),
+    #0c1024;
 }
 
 .panel {
@@ -136,16 +140,6 @@ a {
   font-style: italic;
 }
 
-.background-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: radial-gradient(circle at 20% 20%, rgba(74, 68, 255, 0.25), transparent 40%),
-    radial-gradient(circle at 80% 30%, rgba(255, 101, 91, 0.2), transparent 45%),
-    radial-gradient(circle at 50% 80%, rgba(91, 227, 255, 0.25), transparent 45%),
-    #0c1024;
-}
 
 .footer {
   margin-top: 1rem;

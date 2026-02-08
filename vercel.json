@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "buildCommand": "mkdir -p node_modules/.bin && printf '#!/usr/bin/env bash\npython3 -m pip \"$@\"\\n' > node_modules/.bin/pip3.9 && chmod +x node_modules/.bin/pip3.9 && cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "framework": null,
   "rewrites": [

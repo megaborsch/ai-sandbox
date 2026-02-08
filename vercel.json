@@ -1,21 +1,8 @@
 {
-  "buildCommand": "mkdir -p node_modules/.bin && printf '#!/usr/bin/env bash\npython3 -m pip \"$@\"\\n' > node_modules/.bin/pip3.9 && chmod +x node_modules/.bin/pip3.9 && cd frontend && npm install && npm run build",
+  "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "framework": null,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.py" }
-  ],
-  "functions": {
-    "api/*.py": {
-      "runtime": "@vercel/python@4.2.0",
-      "maxDuration": 30
-    }
-  },
-  "build": {
-    "env": {
-      "PYTHON_VERSION": "3.10",
-      "UV_PYTHON": "3.10",
-      "PYO3_USE_ABI3_FORWARD_COMPATIBILITY": "1"
-    }
-  }
+    { "source": "/api/(.*)", "destination": "/api/$1" }
+  ]
 }

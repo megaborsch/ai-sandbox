@@ -6,7 +6,7 @@
     { "source": "/api/(.*)", "destination": "/api/index.py" }
   ],
   "functions": {
-    "api/index.py": {
+    "api/*.py": {
       "runtime": "@vercel/python@4.0.0",
       "maxDuration": 30
     }

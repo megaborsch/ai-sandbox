@@ -21,6 +21,7 @@ export default function ParticleField() {
   const canvasRef = useRef(null);
   const particlesRef = useRef([]);
   const rafRef = useRef(null);
+  const lastFrameRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -34,13 +35,18 @@ export default function ParticleField() {
       canvas.style.height = window.innerHeight + 'px';
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const count = window.innerWidth < 768 ? 50 : 120;
+      const count = window.innerWidth < 768 ? 25 : 60;
       particlesRef.current = Array.from({ length: count }, () =>
         createParticle(window.innerWidth, window.innerHeight),
       );
     }
 
-    function render() {
+    function render(timestamp = 0) {
+      if (timestamp - lastFrameRef.current < 33) {
+        rafRef.current = requestAnimationFrame(render);
+        return;
+      }
+      lastFrameRef.current = timestamp;
       const w = window.innerWidth;
       const h = window.innerHeight;
       context.clearRect(0, 0, w, h);
